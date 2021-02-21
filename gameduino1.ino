@@ -2,7 +2,12 @@
 
 LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 
-#define BTN_PIN 8
+#define START A0
+#define SELECT A1
+#define RIGHT A2
+#define DOWN A3
+#define UP A4
+#define LEFT A5
 
 #define SPRITE_RUN1 1
 #define SPRITE_RUN2 2
@@ -40,12 +45,23 @@ LiquidCrystal lcd(7, 6, 5, 4, 3, 2);
 // Globals
 static char terrainUpper[TERRAIN_WIDTH + 1];
 static char terrainLower[TERRAIN_WIDTH + 1];
-static bool buttonPushed = false;
+static bool startButtonPushed = false;
+static bool upButtonPushed = false;
+static bool downButtonPushed = false;
+static bool leftButtonPushed = false;
+static bool rightButtonPushed = false;
+static bool selectButtonPushed = false;
+
 
 void setup() {
   initializeGraphics();
   lcd.begin(16, 2);
-  pinMode(BTN_PIN, INPUT);
+  pinMode(START, INPUT_PULLUP);
+  pinMode(SELECT, INPUT_PULLUP);
+  pinMode(UP, INPUT_PULLUP);
+  pinMode(DOWN, INPUT_PULLUP);
+  pinMode(LEFT, INPUT_PULLUP);
+  pinMode(RIGHT, INPUT_PULLUP);
 }
 
 void loop() {
@@ -57,9 +73,23 @@ void loop() {
   static bool blink = false;
   static unsigned int distance = 0;
 
-  // Check if button is pressed
-  if ( digitalRead(BTN_PIN) == 1 ) {
-    buttonPushed = true;
+  if ( digitalRead(START) == 0 ) {
+    startButtonPushed = true;
+  }
+  if ( digitalRead(UP) == 0 ) {
+    upButtonPushed = true;
+  }
+  if ( digitalRead(DOWN) == 0 ) {
+    downButtonPushed = true;
+  }
+  if ( digitalRead(LEFT) == 0 ) {
+    leftButtonPushed = true;
+  }
+  if ( digitalRead(RIGHT) == 0 ) {
+    rightButtonPushed = true;
+  }
+  if ( digitalRead(SELECT) == 0 ) {
+    selectButtonPushed = true;
   }
 
   // Show start screen if not currently playing game
@@ -71,11 +101,11 @@ void loop() {
     }
     delay(250);
     blink = !blink;
-    if (buttonPushed) {
+    if (startButtonPushed) {
       initializeGraphics();
       heroPos = HERO_POSITION_RUN_LOWER_1;
       playing = true;
-      buttonPushed = false;
+      startButtonPushed = false;
       distance = 0;
     }
     return;
@@ -97,9 +127,9 @@ void loop() {
   }
 
   // Jump if button is pressed
-  if (buttonPushed) {
+  if (upButtonPushed) {
     if (heroPos <= HERO_POSITION_RUN_LOWER_2) heroPos = HERO_POSITION_JUMP_1;
-    buttonPushed = false;
+    upButtonPushed = false;
   }
 
   // Draw hero on screen and check for collisions
